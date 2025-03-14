@@ -78,7 +78,7 @@ jobs:
           echo "RELEASE_BODY=$r" >> $GITHUB_OUTPUT
 
       - name: Publishing to GitHub Releases
-        uses: diy97/immortalwrt@v2
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
