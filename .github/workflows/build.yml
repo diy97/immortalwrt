@@ -16,13 +16,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [snapshots]
-        target: [friendlyarm_nanopi-r5c]
+        version: [24.10.0]
+        target: [lunzn_fastrhino-r68s]
         include:
-          - target: friendlyarm_nanopi-r5c
+          - target: lunzn_fastrhino-r68s
             vendor: rockchip
             arch: armv8
-            env_file: r5c.env
+            env_file: r68s.env
             conf_dir: rockchip
 
     steps:
@@ -48,16 +48,16 @@ jobs:
           pf=${{ matrix.vendor }}-${{ matrix.arch }}
           vendor=${{ matrix.vendor }}
           arch=${{ matrix.arch }}
-          IB=$(curl -s https://api.github.com/repos/douglarek/build-openwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E 'openwrt-imagebuilder-' | head -1)
+          IB=$(curl -s https://api.github.com/repos/diy97/immortalwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E 'openwrt-imagebuilder-' | head -1)
           wget -q $IB -O ib.tar.zst
           mkdir ib
           tar -I zstd -xf ib.tar.zst --strip-components=1 -C ib
           cp -a ${{matrix.conf_dir}}/files ib/
           cd ib
-          wget -q https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-imagebuilder-rockchip-armv8.Linux-x86_64.tar.zst
-          zstdcat openwrt-imagebuilder-rockchip-armv8.Linux-x86_64.tar.zst | tar xOf - openwrt-imagebuilder-rockchip-armv8.Linux-x86_64/repositories | grep -v 'kmods/' > repositories
+          wget -q https://downloads.immortalwrt.org/releases/24.10.0/targets/rockchip/armv8/immortalwrt-imagebuilder-24.10.0-rockchip-armv8.Linux-x86_64.tar.zst
+          zstdcat immortalwrt-imagebuilder-24.10.0-rockchip-armv8.Linux-x86_64.tar.zst | tar xOf - immortalwrt-imagebuilder-24.10.0-rockchip-armv8.Linux-x86_64/repositories | grep -v 'kmods/' > repositories
           cat repositories
-          #cd packages && curl -s https://api.github.com/repos/douglarek/dae-openwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E "\-20" | xargs wget -qi - && cd -
+          #cd packages && curl -s https://api.github.com/repos/diy97/immortalwrt/releases/latest | grep browser_download_url | cut -d : -f 2,3 | tr -d \" | grep -E "\-20" | xargs wget -qi - && cd -
           make image PROFILE=${{ env.PROFILE }} PACKAGES=${{ env.PACKAGES }} FILES=${{ env.FILES }} V=sc
           cd -
           tree ib/bin
